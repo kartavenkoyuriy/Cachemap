@@ -52,7 +52,7 @@ public class CacheMapImpl<K, V> implements CacheMap {
     @Override
     public V put(Object key, Object value) {
 //        clearExpired();
-        Entry entry = new Entry(key, value, System.currentTimeMillis());
+        Entry entry = new Entry(key, value, Clock.getTime());
         if (entries == null) {
             entries = new Entry[4];
             entries[0] = entry;
@@ -83,16 +83,14 @@ public class CacheMapImpl<K, V> implements CacheMap {
         if(entries == null){
             return;
         }
-        long currentTime = System.currentTimeMillis();
-        System.out.println("currentTime:" + currentTime);
         for (int i = 0; i < entries.length; i++) {
             if(entries[i] == null){
                 continue;
             }
             System.out.println("entries[i].getCurrentEntryDate():" + entries[i].getCurrentEntryDate());
             System.out.println("getTimeToLive():" + getTimeToLive());
-            System.out.println("entries[i].getCurrentEntryDate() - currentTime > getTimeToLive():" + (entries[i].getCurrentEntryDate() - currentTime > getTimeToLive()));
-            if(entries[i].getCurrentEntryDate() - currentTime > getTimeToLive()){
+            System.out.println("entries[i].getCurrentEntryDate() - currentTime > getTimeToLive():" + (entries[i].getCurrentEntryDate() < getTimeToLive()));
+            if(entries[i].getCurrentEntryDate() < getTimeToLive()){
                 entries[i] = null;
             }
         }
@@ -129,7 +127,7 @@ public class CacheMapImpl<K, V> implements CacheMap {
 
     @Override
     public Object get(Object key) {
-        clearExpired();
+        //clearExpired();
         for (int i = 0; i < entries.length; i++) {
             if(entries[i] == null){
                 return null;
